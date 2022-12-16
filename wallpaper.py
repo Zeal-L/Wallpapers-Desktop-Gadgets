@@ -2,11 +2,17 @@ import json
 import time
 import os
 import threading
+import sys
+
+from PySide6 import QtCore, QtGui, QtWidgets
+from gui import MainWindow
 
 import requests
 from bs4 import BeautifulSoup
 import ctypes
 import tempfile
+
+from qt_material import apply_stylesheet
 
 class Manager:
     def __init__(self):
@@ -66,36 +72,35 @@ class Manager:
                 print("Timeout")
                 return None
             pics[download_url.split('/')[-1]] = response.content
-            time.sleep(1)
 
         return pics
     
     def savePic(self, pic_name, content):
         with open(f"{self.save_path}{pic_name}", 'wb') as f:
             f.write(content)
-        
-
-
-    # for pid, title, artist in zip(pids, titles, artists):
-    #     print(f"Downloading {title} by {artist}")
-    #     pics = getPicsByPid(pid)
-    #     for pic_name, pic in pics.items():
-    #         with open(f"{SAVE_PATH}{pic_name}", 'wb') as f:
-    #             f.write(pic)
-    
-
+            
+    def showRankings(self):
+        return zip(self.pids, self.titles, self.artists)
+            
 
 if __name__ == "__main__":
     manager = Manager()
 
-    pids, titles, artists = manager.getInfo()
-    
-    print(f"id: {pids[0]}; {titles[0]} by {artists[0]}")
-    manager.newThreadTask(manager.changeWallpaper, (manager.getPicsByPid(pids[0])[list(manager.getPicsByPid(pids[0]).keys())[0]],))
-    
-    manager.savePic(list(manager.getPicsByPid(pids[0]).keys())[0], manager.getPicsByPid(pids[0])[list(manager.getPicsByPid(pids[0]).keys())[0]])
-        
+    # pids, titles, artists = manager.getInfo()
 
+    # print(f"id: {pids[0]}; {titles[0]} by {artists[0]}")
+    # manager.newThreadTask(manager.changeWallpaper, (manager.getPicsByPid(pids[0])[list(manager.getPicsByPid(pids[0]).keys())[0]],))
+    
+    # manager.savePic(list(manager.getPicsByPid(pids[0]).keys())[0], manager.getPicsByPid(pids[0])[list(manager.getPicsByPid(pids[0]).keys())[0]])
+    
+
+    app = QtWidgets.QApplication()
+    window = MainWindow(manager)
+    
+    window.show()
+    sys.exit(app.exec())
+    
+    
 
 
 
